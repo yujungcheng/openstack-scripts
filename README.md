@@ -1,8 +1,9 @@
 ## OpenStack Scripts
-Python3 scripts for querying OpenStack data to provide rich result for further troubleshooting and data collection.
-Tested on Ubuntu18.04 with openstacksdk 0.17.2-0ubuntu1~cloud0
+Python3 scripts for querying OpenStack data to provide rich infofor further troubleshooting and data collection.
+Tested on Ubuntu 20.04 python3-openstacksdk 0.46.0-0ubuntu1
 
-Scripts:
+
+##Scripts:
 ```
 ops-vm.py     - query instance data
 ops-net.py    - query network data
@@ -11,6 +12,7 @@ ops-swift.py  - query swift object data
 
 ## Version
 2021-07-10 - draft
+2021-07-17 - update network script
 
 ## Install openstacksdk
 **Install openstacksdk**

@@ -179,6 +179,7 @@ def show_vm(vm):
 
     print(f'  Security Groups:')
     #vm_sgs = conn.compute.fetch_server_security_groups(server.id) # not support
+    #print(vm_sgs)
     vm_security_groups = set([ a_dict['name'] for a_dict in server.security_groups ])
     for vm_security_group in vm_security_groups:
         security_group = security_groups[vm_security_group]
