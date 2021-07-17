@@ -3,11 +3,11 @@ Python3 scripts for querying OpenStack data to provide rich infofor further trou
 Tested on Ubuntu 20.04 python3-openstacksdk 0.46.0-0ubuntu1
 
 
-##Scripts:
+## Scripts:
 ```
 ops-vm.py    - query instance data
 ops-net.py    - query network data
-ops-swift.py    - query swift object data 
+ops-swift.py    - query swift object data
 ops-swift-check-object.py    - check object metadata/status
 ops-swift-check-container-sync.py    - check container sync status
 ```
@@ -22,7 +22,46 @@ apt install python3-openstacksdk python3-openstacksdk
 ```
 
 ## Usage
-TBA
+```
+# list projects
+$ ./ops-vm.py --project
+
+# list users
+$ ./ops-vm.py --user
+
+# list VM
+$ ./ops-vm.py --vm <Project ID> 
+
+# show VM
+$ ./ops-vm.py <VM ID> [<VM ID> ...]
+
+# list network
+$ ./ops-net.py list network <Project ID>
+
+# list router
+$ ./ops-net.py list router <Project ID>
+
+# show network
+$ ./ops-net.py show network <Network ID>
+
+# show router
+$ ./ops-net.py show router <Router ID>
+
+# list swift container
+$ ./ops-swift.py list container <Project ID>
+
+# list swift object
+$ ./ops-swift.py list object <Project ID> <Container Name>
+
+# show swift container
+$ ./ops-swift.py show container <Project ID> <Container Name>
+
+# show swift object
+$ ./ops-swift.py show object <Project ID> <Container Name> <Object Name>
+```
+
+## Todo
+* move common functions into common.py
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. Please make sure to update tests as appropriate.
