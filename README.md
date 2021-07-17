@@ -5,19 +5,20 @@ Tested on Ubuntu 20.04 python3-openstacksdk 0.46.0-0ubuntu1
 
 ##Scripts:
 ```
-ops-vm.py     - query instance data
+ops-vm.py    - query instance data
 ops-net.py    - query network data
-ops-swift.py  - query swift object data 
+ops-swift.py    - query swift object data 
+ops-swift-check-object.py    - check object metadata/status
+ops-swift-check-container-sync.py    - check container sync status
 ```
 
 ## Version
 2021-07-10 - draft
 2021-07-17 - update network script
 
-## Install openstacksdk
-**Install openstacksdk**
+## Install python3 openstacksdk and openstackclient
 ```
-apt install python3-openstacksdk
+apt install python3-openstacksdk python3-openstacksdk
 ```
 
 ## Usage
