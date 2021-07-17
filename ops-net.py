@@ -11,11 +11,9 @@ import openstack
 conn = openstack.connect()
 
 
-def list_project(_print=True):
-    #projects = [project.id for project in conn.list_projects()]
+def list_project():
     for project in conn.list_projects():
-        if _print:
-            print(f'{project.id} | {project.name}')
+        print(f'{project.id} | {project.name}')
 
 def list_network(project_id):
     project = conn.get_project(project_id)
@@ -32,7 +30,7 @@ def list_network(project_id):
             cidr = subnet_info.cidr
             allocation_pools = subnet_info.allocation_pools
             print((f'  Subnet: {subnet} | {cidr} | {gateway_ip} | {dns_nameservers} | '
-                f'{dhcp_enabled} | {allocation_pools}'))
+                   f'{dhcp_enabled} | {allocation_pools}'))
 
 def list_router(project_id):
     project = conn.get_project(project_id)
@@ -49,29 +47,29 @@ def show_network(network_id):
         exit()
     segmentation_id = network['provider:segmentation_id']
     subnets = ','.join(network['subnets'])
-
+    
     print(f'Network: {network.id} | {network.name} | SegmentID:{segmentation_id}')
     print(f'  Project ID: {network.project_id}')
     print(f'  Subnets:')
-    for subnet in network['subnets']:
-        subnet_info = conn.get_subnet_by_id(subnet)
-        dhcp_enabled = subnet_info.enable_dhcp
-        dns_nameservers = subnet_info.dns_nameservers
-        gateway_ip = subnet_info.gateway_ip
-        cidr = subnet_info.cidr
-        allocation_pools = subnet_info.allocation_pools
-        print((f'    Subnet: {subnet} | {cidr} | {gateway_ip} | {dns_nameservers} | '
-               f'{dhcp_enabled} | {allocation_pools}'))
-        ext = conn.get_network_extensions()
-
+    for subnet_id in network['subnets']:
+        s = conn.get_subnet_by_id(subnet_id)
+        print((f'    Subnet: {s.id} | {s.cidr} | {s.gateway_ip} | {s.dns_nameservers} | '
+               f'DHCP:{s.enable_dhcp}'))
+        print(f'      DHCP Allocation Pools:')
+        allocation_pools = s.allocation_pools
+        for pool in allocation_pools:
+            print(f'        {pool["start"]} - {pool["end"]}')
+        
     print(f'  Ports:')
-    project_id = network.project_id
+    project_id = network.project_id 
     project = conn.get_project(project_id)
     project_conn = conn.connect_as_project(project)
     ports = project_conn.list_ports()
     for p in ports:
         if p.network_id == network_id:
-            print(f'    Port: {p.id} | {p.name} | {p.mac_address} | {p.status}')
+            print(f'    Port: {p.id} | {p.name} | {p.status}')
+            print(f'      MAC Address: {p.mac_address}')
+            print(f'      Device ID: {p.device_id}')
             print(f'      Fixed IPs:')
             for fixed_ip in p.fixed_ips:
                 print(f'        {fixed_ip["ip_address"]} | {fixed_ip["subnet_id"]}')
@@ -82,33 +80,34 @@ def show_router(router_id):
     if router == None:
         print(f'Router not found')
         exit()
-    print(f'Router: {router.id} | {router.name} | {router.status} | HA:{router.ha} | {router.created_at}')
-    r_ifs = conn.list_router_interfaces(router)
-    for r_if in r_ifs:
-        print(f'  Interface: {r_if.id} | {r_if.name} | {r_if.mac_address} | {r_if.status} ')
-        network = conn.get_network(r_if.network_id)
-        print(f'    Network: {r_if.network_id } | {network.name}')
+    print((f'Router: {router.id} | {router.name} | {router.status} | HA:{router.ha} | '
+           f'{router.external_gateway_info} | {router.created_at}'))
+    ifs = conn.list_router_interfaces(router)
+    for i in ifs:
+        print(f'  Interface: {i.id} | {i.name} | {i.mac_address} | {i.status} ')
+        network = conn.get_network(i.network_id)
+        print(f'    Network: {i.network_id } | {network.name}')
 
+        print(f'    Binding Host ID: {i["binding:host_id"]}')
+        print(f'    Device Owner: {i["device_owner"]}')
+        print(f'    Port Security Enabled: {i["port_security_enabled"]}')
+        print(f'    Admin State Up: {i["admin_state_up"]}')
+        print(f'    Created At: {i["created_at"]}')
+        
         print(f'    FixedIPs:')
-        fixed_ips = r_if.fixed_ips
+        fixed_ips = i.fixed_ips
         for fixed_ip in fixed_ips:
             print(f'      {fixed_ip["ip_address"]} | {fixed_ip["subnet_id"]}')
 
         print(f'    DNS:')
-        dns_assignment = r_if.dns_assignment
+        dns_assignment = i.dns_assignment
         for dns in dns_assignment:
             print(f'      {dns["hostname"]} | {dns["ip_address"]} | {dns["fqdn"]}')
 
         print(f'    Security Groups:')
-        security_groups = r_if["security_groups"]
+        security_groups = i["security_groups"]
         for sg in security_groups:
             print(f'      Security Group: {sg}')
-
-        host_id = r_if["binding:host_id"]
-        device_owner = r_if["device_owner"]
-        port_security_enabled = r_if["port_security_enabled"]
-        admin_state_up = r_if["admin_state_up"]
-        created_at = r_if["created_at"]
 
 
 def main(argv):
