@@ -16,8 +16,9 @@ import sys
 import argparse
 import itertools
 import subprocess
-import datetime
 import openstack
+from datetime import datetime, timedelta
+import novaclient.client as novclient
 
 
 #os.environ['OS_IDENTITY_API_VERSION'] = '3'
@@ -26,6 +27,8 @@ opsvm_data_file = "opsvm.data.tmp"
 
 all_projects = {}
 all_users = {}
+
+datetime_add_hours = 10
 
 
 def run_cmd(cmd):
@@ -36,8 +39,14 @@ def write(data):
     with open(opsvm_data_file, 'w') as f:
         f.write(data)
 
-def format_datetime(datetime_string, timezone=None):
-    return
+def format_datetime(datetime_string, add_hours=None):
+    try:
+        dt_obj = datetime.strptime(datetime_string, '%Y-%m-%dT%H:%M:%S.%f')
+    except:
+        dt_obj = datetime.strptime(datetime_string, '%Y-%m-%dT%H:%M:%SZ')
+    if add_hours == None:
+        return str(dt_obj)
+    return str(dt_obj + timedelta(hours=add_hours))
 
 def convert_power_status(state):
     power_state = ['No State', 'Running', 'Blocked', 'Paused', 'Shutdown', 'Shutoff',
@@ -105,7 +114,7 @@ def show_vm(vm):
         port = conn.get_port(interface.port_id)
         if_info['name'] = port.name
         if_info['security_groups'] = port.security_groups
-        if_info['created_at'] = port.created_at
+        if_info['created_at'] = format_datetime(port.created_at, add_hours=datetime_add_hours)
         if_info['state'] = interface.port_state
         if_info['port_id'] = interface.port_id
         if_info['mac'] = interface.mac_addr
@@ -125,10 +134,12 @@ def show_vm(vm):
     for security_group in all_security_groups:
         security_groups[security_group.name] = security_group
 
+    launched_at = format_datetime(vm_info["OS-SRV-USG:launched_at"], add_hours=datetime_add_hours)
     print(f'Instnace: {server.id} | {server.name}')
     print(f'  Status: {vm_info["OS-EXT-STS:vm_state"]}')
     print(f'  Power State: {power_state}')
-    print(f'  Launched At: {vm_info["OS-SRV-USG:launched_at"]}')
+    #print(f'  Launched At: {vm_info["OS-SRV-USG:launched_at"]}')
+    print(f'  Launched At: {launched_at}')
     print(f'  Project ID: {server.project_id} | {project.name}')
     print(f'  User ID: {server.user_id} | {user_name} | Email:{user_email}')
     print(f'  Key Name: {server.key_name}')
@@ -146,8 +157,9 @@ def show_vm(vm):
         print((f'    Volume: {vol_info.id} | {vol_info.name} | {vol_info.volume_type} | '
             f'{vol_info.size}GB'))
         for attachment in vol_info.attachments:
+            attached_at = format_datetime(attachment.attached_at, add_hours=datetime_add_hours)
             print((f'      attachment: {attachment.attachment_id} | {attachment.device} | '
-                f'{attachment.attached_at}'))
+                f'{attached_at}'))
 
     print(f'  Networks:')
     vm_addresses = server.addresses
@@ -172,7 +184,7 @@ def show_vm(vm):
         net_interfaces = vm_interfaces[network.id]
         for net_if in net_interfaces:
             print((f'        Port: {net_if["port_id"]} | {net_if["mac"]} | {net_if["name"]} | '
-                f'{net_if["state"]}'))
+                f'{net_if["state"]} | {net_if["created_at"]}'))
             for fixed_ip in net_if['fixed_ips']:
                 print((f'          Address: {fixed_ip["ip_address"]} | '
                     f'Subnet ID:{fixed_ip["subnet_id"]}'))
@@ -190,7 +202,7 @@ def show_vm(vm):
                 f'{rule["port_range_min"]}:{rule["port_range_max"]} | '
                 f'{rule["remote_ip_prefix"]} | {rule["remote_group_id"]}'))
 
-    print(f'  Last 5 Events:')
+    print(f'  Last 5 Events:')  # todo: investigate to novaclient api
     output = run_cmd(f'openstack server event list -f value --long {server.id}')
     event_count = 0
     for line in output:
@@ -200,14 +212,16 @@ def show_vm(vm):
                 line_arr[5] = all_projects[line_arr[5]]
             if line_arr[6] in all_users:
                 line_arr[6] = all_users[line_arr[6]]
-            print(f'    Event: {line_arr[2]} | {line_arr[3]} | {line_arr[5]} | {line_arr[6]}')
+            dt_aest = format_datetime(line_arr[3], add_hours=datetime_add_hours)
+            print(f'    Event: {line_arr[2]} | {dt_aest} | {line_arr[5]} | {line_arr[6]}')
             event_count += 1
         if event_count == 5:
             break
     print()
+    
 
 def main(args):
-    now = datetime.datetime.now()
+    now = datetime.now()
     print(f'{now}...\n')
     if args['project']:
         list_project()
