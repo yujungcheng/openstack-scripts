@@ -17,6 +17,9 @@ def list_project():
 def set_project(project_id):
     global conn
     project = conn.get_project(project_id)
+    if project == None:
+        print(f'Project not found')
+        return
     print(f'Set to project', argv[2], f'|', f'{project.name}', "\n")
     os.environ["OS_PROJECT_ID"] = project_id
     os.environ["OS_PROJECT_NAME"] = project.name
@@ -41,7 +44,7 @@ def list_object(container_name):
             print((f'{o.last_modified} | {o.content_type} | {o.hash} | '
                f'{o.name} | {o.bytes}'))
     else:
-        objects_file = "./list_object.container_name"
+        objects_file = "./result.list_object.container_name"
         print(f'object count >= 10000, write data to file {objects_file}')
         objects = []
         # ref: /usr/lib/python3/dist-packages/openstack/object_store/v1/obj.py
@@ -61,13 +64,20 @@ def list_object(container_name):
 
 def show_container(container_name):
     c = conn.get_container(container_name)
+    if c == None:
+        print(f'Container not found')
+        return
     for key, value in c.items():
         print(f'{key}: {value}')
 
 def show_object(container_name, object_name):
     o = conn.get_object(container_name, object_name)
+    if o == None:
+        print(f'Object not found')
+        return
     for key, value in o[0].items():
         print(f'{key}: {value}')
+
 
 def main(argv):
     if len(argv) == 0:
