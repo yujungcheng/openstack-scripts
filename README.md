@@ -58,10 +58,17 @@ $ ./ops-swift.py show container <Project ID> <Container Name>
 
 # show swift object
 $ ./ops-swift.py show object <Project ID> <Container Name> <Object Name>
+
+# check swift object metadata (multithread)
+$ edit ./clouds.yaml for authentication
+$ ./ops-swift-check-object.py --cloud <Cloud Name) --projectname <Project Name> --containername <Container Name>
+$ ./ops-swift-check-object.py --cloud <Cloud Name) --projectname <Project Name> --containername <Container Name> --objectlistfile <Object List File>>
+
 ```
 
 ## Todo
 * move common functions into common.py
+* redesign resume feature for ops-swift-check-object.py, store sequence number when getting object list.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. Please make sure to update tests as appropriate.

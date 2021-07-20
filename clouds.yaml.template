@@ -1,0 +1,10 @@
+clouds:
+  <Cloud Name>:
+    region_name: <Region Name>
+    auth:
+      auth_url: <AUTH URL>
+      project_name: <Project Name>
+      tenant_id: <Project ID>
+      username: <Username>
+      password: <Password>
+      domain_name: default
