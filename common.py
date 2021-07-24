@@ -23,7 +23,7 @@ def write_to_file(filename, data, mode='w'):
         with open(filename, mode) as f:
             f.write(data)
         return True
-    except Exception as e
+    except Exception as e:
         print(f'write_to_file error: {e}')
         return False
 
