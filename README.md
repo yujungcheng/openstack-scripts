@@ -15,6 +15,8 @@ ops-swift-monitor-object-disk.py    - monitor object disk and partions change
 ops-cinder-map-rbd-du-with-volume-info.py    - map rbd du output to cinder volume info
 ops-client-example.py    - examples use openstack component clients for developing
 
+other/pygrep.py    - comparing specific column/field value between two files
+other/db-get-last-vm-action.py    - get instance last start/stop/create action from database
 ```
 
 ## Version
