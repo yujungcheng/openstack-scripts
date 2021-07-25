@@ -11,6 +11,7 @@ ops-swift.py    - query swift object data
 ops-swift-check-object.py    - check object metadata/status
 ops-swift-list-container-sync.py    - get container sync json file
 ops-swift-check-container-sync.py    - check container sync status
+ops-swift-monitor-object-disk.py    - monitor object disk and partions change
 ops-cinder-map-rbd-du-with-volume-info.py    - map rbd du output to cinder volume info
 ops-client-example.py    - examples use openstack component clients for developing
 
