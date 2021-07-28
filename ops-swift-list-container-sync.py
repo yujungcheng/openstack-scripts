@@ -79,9 +79,8 @@ for project in conn.identity.projects():
             # there is only 'x-container-sync-to' metadata.
             # unfortunately there is no 'x-container-sync-FROM', so we can't check the other direction
             try:
-                all_source_containers.append(f"{cloud_name},{project.name},{container.name}")
-
                 if metadata.get('x-container-sync-to'):
+                    all_source_containers.append(f"{cloud_name},{project.name},{container.name},sync_enabled")
                     print(f'[{project.name}] {container.name} ({container.count} objects) -> '
                           f'{metadata.get("x-container-sync-to") }')
                     container['project'] = project.name
@@ -100,6 +99,8 @@ for project in conn.identity.projects():
                                         "container": sync_array[5]}
                     compare = [source_container, target_container]
                     container_compare_list.append(compare)
+                else:
+                    all_source_containers.append(f"{cloud_name},{project.name},{container.name},sync_disabled")
 
             except AttributeError:
                 pass  # some containers have no metadata at all, for unknown reasons
