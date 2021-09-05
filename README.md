@@ -2,6 +2,7 @@
 Python3 scripts for querying OpenStack data to provide rich infofor further troubleshooting and data collection.
 Tested on Ubuntu 20.04 python3-openstacksdk 0.46.0-0ubuntu1
 
+Include some scripts for CEPH storage.
 
 ## Scripts:
 ```
